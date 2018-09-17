@@ -1,0 +1,655 @@
+package eagleeye;
+
+import static eagleeye.EagleEye.ee;
+import java.awt.Color;
+import java.awt.Image;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ * @author aftab
+ */
+ public class LastPage extends javax.swing.JFrame
+{
+    /**
+     * Creates new form LastPage
+     */
+     
+     private String user_Id;
+     private String userNameString;
+     private String statusString;
+     
+     private Image  userImage;
+     private byte[] imageBytes;
+     
+     private final DefaultTableCellRenderer centerRenderer;
+     private final DefaultTableModel tableModel;
+     
+     private boolean nightMode = false;
+    
+     public LastPage()
+    {
+         initComponents();     
+         this.setLocationRelativeTo(null);
+        
+         tableModel = (DefaultTableModel) this.videoTable.getModel();
+         centerRenderer = new DefaultTableCellRenderer();
+    }
+
+     public void setUser(String userId)
+   { 
+         user_Id = userId;
+         //System.out.println("U ID IS "+user_Id);
+         try
+        {    
+             ee.sql.rs = ee.sql.stmnt.executeQuery("SELECT * FROM [UserTable] WHERE [UserId] = '"+user_Id+"';");
+        }
+         catch (SQLException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),"ERROR",ERROR_MESSAGE);
+        }
+        
+        statusString = "Not Admin";
+         
+         try
+        {
+             while(ee.sql.rs.next())
+            {
+                 userNameString = ee.sql.rs.getString("SirName").trim() + " " + ee.sql.rs.getString("FullName").trim();
+                 imageBytes = ee.sql.rs.getBytes("Image");
+                 if(ee.sql.rs.getInt("IsAdmin")==1)
+                 {
+                     statusString = "Admin";
+                 }
+            }
+        }
+         catch (SQLException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),"ERROR",ERROR_MESSAGE);
+        }
+            
+         this.userNameLabel.setText(this.userNameString);
+         this.statusLabel.setText(this.statusString);
+                 
+         ByteArrayInputStream bias = new ByteArrayInputStream(imageBytes);
+         try
+        {
+             userImage = ImageIO.read(bias);
+        }
+         catch (IOException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),"ERROR",ERROR_MESSAGE);
+        }
+            
+            this.imageLabel.setIcon(new ImageIcon(userImage.getScaledInstance(150,150,4)));
+            
+         revalidate();
+         repaint();
+         reDesignTable();
+   }
+    
+     public void reDesignTable()
+    {
+         centerRenderer.setHorizontalAlignment( SwingConstants.CENTER );
+         for(int i=0; i<5;i++)
+        {
+             videoTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+        
+         try
+        {
+             ee.sql.rs = ee.sql.stmnt.executeQuery("SELECT [VideoId] "   +
+                                                         ",[DateTaken] " +
+                                                         ",[TimeTaken] " +
+                                                         ",[Reviewed] "  +
+                                                  "FROM [EagleEye].[dbo].[VideoTable]");
+        }
+         catch (SQLException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),"ERROR",ERROR_MESSAGE);
+        }
+        
+         int i=0;
+         try
+        {
+             while(ee.sql.rs.next())
+            {
+                 String r = "No";
+                 if(ee.sql.rs.getInt("Reviewed")==1)
+                {
+                     r = "Yes";
+                }
+                        
+                 Object[] array = new Object[]{++i,ee.sql.rs.getString("VideoId"),ee.sql.rs.getDate("DateTaken"),ee.sql.rs.getTime("TimeTaken"),r};
+                 tableModel.addRow(array);
+            }
+        }
+         catch (SQLException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),"ERROR",ERROR_MESSAGE);
+        }
+    }
+     public void nightModeDidabledByDevice()
+     {
+         this.nightMode = false;
+         this.nightModeButton.setText("ENABLE THEIF MODE");
+         this.revalidate();;
+         this.repaint();
+     }
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        LastPageMainPanel = new javax.swing.JPanel();
+        logoLabel = new javax.swing.JLabel();
+        imageLabel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        videoTable = new javax.swing.JTable();
+        namePanel = new javax.swing.JPanel();
+        userNameLabel = new javax.swing.JLabel();
+        userName = new javax.swing.JLabel();
+        status = new javax.swing.JLabel();
+        statusLabel = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        videoIdLabel = new javax.swing.JLabel();
+        videoIdField = new javax.swing.JTextField();
+        viewButton = new javax.swing.JButton();
+        deleteButton = new javax.swing.JButton();
+        startLiveStream = new javax.swing.JButton();
+        nightModeButton = new javax.swing.JButton();
+        AftabKhalil = new javax.swing.JLabel();
+        DeviceLabel = new javax.swing.JLabel();
+        DeviceStatus = new javax.swing.JLabel();
+        logOutLabel = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("Eagle Eye ...");
+        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
+
+        LastPageMainPanel.setBackground(new java.awt.Color(0, 0, 0));
+
+        logoLabel.setIcon(new javax.swing.ImageIcon("E:\\EagleEye\\R\\logo.png")); // NOI18N
+
+        imageLabel.setBackground(new java.awt.Color(0, 0, 0));
+        imageLabel.setIcon(new javax.swing.ImageIcon("E:\\EagleEye\\R\\user.png")); // NOI18N
+
+        videoTable.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        videoTable.setFont(new java.awt.Font("MV Boli", 2, 14)); // NOI18N
+        videoTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "S. No.", "Video Id", "Date Taken", "Time Taken", "Reviewed"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        videoTable.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        videoTable.setEnabled(false);
+        videoTable.setGridColor(new java.awt.Color(0, 0, 0));
+        jScrollPane1.setViewportView(videoTable);
+
+        namePanel.setBackground(new java.awt.Color(0, 0, 0));
+
+        userNameLabel.setFont(new java.awt.Font("MV Boli", 1, 14)); // NOI18N
+        userNameLabel.setForeground(new java.awt.Color(255, 255, 255));
+        userNameLabel.setText("Aftab Khalil");
+
+        userName.setFont(new java.awt.Font("MV Boli", 1, 14)); // NOI18N
+        userName.setForeground(new java.awt.Color(255, 255, 255));
+        userName.setText("User Name:");
+
+        status.setFont(new java.awt.Font("MV Boli", 1, 14)); // NOI18N
+        status.setForeground(new java.awt.Color(255, 255, 255));
+        status.setText("Status:");
+
+        statusLabel.setFont(new java.awt.Font("MV Boli", 1, 14)); // NOI18N
+        statusLabel.setForeground(new java.awt.Color(255, 255, 255));
+        statusLabel.setText("Admin");
+
+        javax.swing.GroupLayout namePanelLayout = new javax.swing.GroupLayout(namePanel);
+        namePanel.setLayout(namePanelLayout);
+        namePanelLayout.setHorizontalGroup(
+            namePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(namePanelLayout.createSequentialGroup()
+                .addGroup(namePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(userName, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(status))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(namePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(statusLabel)
+                    .addComponent(userNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        namePanelLayout.setVerticalGroup(
+            namePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(namePanelLayout.createSequentialGroup()
+                .addContainerGap(19, Short.MAX_VALUE)
+                .addGroup(namePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(userName)
+                    .addComponent(userNameLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(namePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(statusLabel)
+                    .addComponent(status)))
+        );
+
+        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+
+        videoIdLabel.setFont(new java.awt.Font("MV Boli", 1, 14)); // NOI18N
+        videoIdLabel.setForeground(new java.awt.Color(255, 255, 255));
+        videoIdLabel.setText("Video Id:");
+
+        videoIdField.setFont(new java.awt.Font("MV Boli", 1, 14)); // NOI18N
+        videoIdField.setMargin(new java.awt.Insets(0, 2, 0, 2));
+        videoIdField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                videoIdFieldActionPerformed(evt);
+            }
+        });
+
+        viewButton.setText("View");
+        viewButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewButtonActionPerformed(evt);
+            }
+        });
+
+        deleteButton.setText("Delete");
+
+        startLiveStream.setText("Start Live Stream");
+        startLiveStream.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startLiveStreamActionPerformed(evt);
+            }
+        });
+
+        nightModeButton.setText("Enable Theif Mode");
+        nightModeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nightModeButtonActionPerformed(evt);
+            }
+        });
+
+        AftabKhalil.setForeground(new java.awt.Color(255, 255, 255));
+        AftabKhalil.setText("Made By: Aftab Khalil, B14158002");
+
+        DeviceLabel.setFont(new java.awt.Font("MV Boli", 1, 14)); // NOI18N
+        DeviceLabel.setForeground(new java.awt.Color(255, 255, 255));
+        DeviceLabel.setText("Device:");
+
+        DeviceStatus.setFont(new java.awt.Font("MV Boli", 1, 14)); // NOI18N
+        DeviceStatus.setForeground(new java.awt.Color(255, 0, 0));
+        DeviceStatus.setText("Not Connected");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(videoIdLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(videoIdField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(viewButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(deleteButton)
+                .addGap(123, 123, 123)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(nightModeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(startLiveStream, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(DeviceLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(DeviceStatus)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(AftabKhalil))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(DeviceLabel)
+                        .addComponent(DeviceStatus))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(startLiveStream)
+                            .addComponent(deleteButton)
+                            .addComponent(viewButton)
+                            .addComponent(videoIdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(videoIdLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(nightModeButton)
+                        .addGap(17, 17, 17)
+                        .addComponent(AftabKhalil)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        logOutLabel.setBackground(new java.awt.Color(0, 0, 0));
+        logOutLabel.setFont(new java.awt.Font("MV Boli", 2, 14)); // NOI18N
+        logOutLabel.setForeground(new java.awt.Color(255, 255, 255));
+        logOutLabel.setText("LogOut");
+        logOutLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        logOutLabel.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                logOutLabelFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                logOutLabelFocusLost(evt);
+            }
+        });
+        logOutLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                logOutLabelMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                logOutLabelMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                logOutLabelMouseExited(evt);
+            }
+        });
+
+        javax.swing.GroupLayout LastPageMainPanelLayout = new javax.swing.GroupLayout(LastPageMainPanel);
+        LastPageMainPanel.setLayout(LastPageMainPanelLayout);
+        LastPageMainPanelLayout.setHorizontalGroup(
+            LastPageMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(LastPageMainPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(LastPageMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(LastPageMainPanelLayout.createSequentialGroup()
+                        .addGroup(LastPageMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, LastPageMainPanelLayout.createSequentialGroup()
+                                .addGroup(LastPageMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(LastPageMainPanelLayout.createSequentialGroup()
+                                        .addGap(276, 276, 276)
+                                        .addComponent(logoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(namePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
+                                .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, LastPageMainPanelLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(logOutLabel)
+                        .addGap(49, 49, 49))))
+        );
+        LastPageMainPanelLayout.setVerticalGroup(
+            LastPageMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(LastPageMainPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(LastPageMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(logoLabel)
+                    .addComponent(namePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(logOutLabel)
+                .addGap(1, 1, 1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(LastPageMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(LastPageMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+         JOptionPane.showMessageDialog(this,"The application will continue to work in the background.","I am not closing!",INFORMATION_MESSAGE);
+         ee.lp.setVisible(false);
+         ee.mf.setEnabled(true);
+    }//GEN-LAST:event_formWindowClosing
+
+    private void videoIdFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_videoIdFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_videoIdFieldActionPerformed
+
+    private void nightModeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nightModeButtonActionPerformed
+        if(ee.deviceConnected==true)
+       {
+           if(nightMode==false)
+           {
+                ee.sender.send("START_NIGHT_MODE");
+                this.nightModeButton.setText("DISABLE THIEF MODE");
+                nightMode = true;
+                this.revalidate();
+                this.repaint();
+           }
+           else
+           {
+               ee.sender.send("STOP_NIGHT_MODE");
+               this.nightModeButton.setText("ENABLE THIEF MODE");
+               nightMode = false;
+               this.revalidate();
+               this.repaint();
+           }
+       }
+       else
+       {
+           JOptionPane.showMessageDialog(this,"Device is not connected make sure that it is working fine.", "Device not connected", ERROR_MESSAGE);
+       }
+    }//GEN-LAST:event_nightModeButtonActionPerformed
+
+    private void logOutLabelFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_logOutLabelFocusGained
+        logOutLabel.setForeground(Color.red);
+    }//GEN-LAST:event_logOutLabelFocusGained
+
+    private void logOutLabelFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_logOutLabelFocusLost
+        logOutLabel.setForeground(Color.white);
+    }//GEN-LAST:event_logOutLabelFocusLost
+
+    private void logOutLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logOutLabelMouseClicked
+        ee.fp.setVisible(true);
+        ee.lp.setVisible(false);
+    }//GEN-LAST:event_logOutLabelMouseClicked
+
+    private void logOutLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logOutLabelMouseEntered
+        logOutLabel.setForeground(Color.red);
+    }//GEN-LAST:event_logOutLabelMouseEntered
+
+    private void logOutLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logOutLabelMouseExited
+        logOutLabel.setForeground(Color.white);
+    }//GEN-LAST:event_logOutLabelMouseExited
+
+    private void viewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewButtonActionPerformed
+        String videoId = this.videoIdField.getText();
+        if(videoId.compareTo("")==0)
+        {
+             JOptionPane.showMessageDialog(this, "Kindly Write VideoID of any of the Above Listed Videos.","VideoID",ERROR_MESSAGE);
+             return;
+        }
+        
+         try
+        {
+             ee.sql.rs = ee.sql.stmnt.executeQuery("SELECT [VideoFile] "
+                                                 + "FROM [EagleEye].[dbo].[VideoTable] "
+                                                 + "WHERE [VideoId] = '"+videoId+"';");
+        }
+         catch (SQLException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),ex.getLocalizedMessage(),ERROR_MESSAGE);
+        }
+         
+         
+         byte[] videoBytes = null;
+         try
+        {
+             if(ee.sql.rs.isBeforeFirst())
+            {
+                 while(ee.sql.rs.next())
+                 {
+                      videoBytes = ee.sql.rs.getBytes("VideoFile");
+                      System.out.println("len is " + videoBytes.length);
+                 }
+            }
+             else
+            {
+                 JOptionPane.showMessageDialog(this, "No Video With Such ID\nPlease Write the ID From Above Listed IDs!","ID ERROR",ERROR_MESSAGE);
+                 return;
+            }
+        }
+         catch (SQLException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),ex.getLocalizedMessage(),ERROR_MESSAGE);
+        }
+         
+         File f = new File("E:\\EagleEye\\V\\EagleEyeVideo.mp4");
+         BufferedOutputStream bos;
+         FileOutputStream fis = null;
+         
+         try
+        {
+             fis = new FileOutputStream(f);
+        }
+         catch (FileNotFoundException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),ex.getLocalizedMessage(),ERROR_MESSAGE);
+        }
+         
+         bos = new BufferedOutputStream(fis);
+         
+         try
+        {
+             bos.write(videoBytes,0,videoBytes.length);
+        } 
+         catch (IOException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),ex.getLocalizedMessage(),ERROR_MESSAGE);
+        }
+        
+         ProcessBuilder pb = new ProcessBuilder("C:\\Program Files\\VideoLAN\\VLC\\vlc.exe", f.getAbsolutePath());
+         try
+        {
+             pb.start();
+        }
+         catch (IOException ex)
+        {
+             JOptionPane.showMessageDialog(this, ex.getMessage(),ex.getLocalizedMessage(),ERROR_MESSAGE);
+        } 
+    }//GEN-LAST:event_viewButtonActionPerformed
+
+    private void startLiveStreamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startLiveStreamActionPerformed
+       if(ee.deviceConnected==true)
+       {
+           ee.sender.send("START_LIVE_STREAM");
+        this.setEnabled(false);
+       this.setVisible(false);
+       ee.lsc.setVisible(true);
+       }
+       else
+       {
+           JOptionPane.showMessageDialog(this,"Device is not connected make sure that it is working fine.", "Device not connected", ERROR_MESSAGE);
+       }
+    }//GEN-LAST:event_startLiveStreamActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(LastPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(LastPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(LastPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(LastPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new LastPage().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel AftabKhalil;
+    private javax.swing.JLabel DeviceLabel;
+    public javax.swing.JLabel DeviceStatus;
+    private javax.swing.JPanel LastPageMainPanel;
+    private javax.swing.JButton deleteButton;
+    private javax.swing.JLabel imageLabel;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel logOutLabel;
+    private javax.swing.JLabel logoLabel;
+    private javax.swing.JPanel namePanel;
+    private javax.swing.JButton nightModeButton;
+    private javax.swing.JButton startLiveStream;
+    private javax.swing.JLabel status;
+    private javax.swing.JLabel statusLabel;
+    private javax.swing.JLabel userName;
+    private javax.swing.JLabel userNameLabel;
+    private javax.swing.JTextField videoIdField;
+    private javax.swing.JLabel videoIdLabel;
+    private javax.swing.JTable videoTable;
+    private javax.swing.JButton viewButton;
+    // End of variables declaration//GEN-END:variables
+}
